@@ -1,1 +1,0 @@
-{"default":{"identifier":"default","description":"小剪默认权限","local":true,"windows":["main"],"permissions":["core:default","dialog:default","fs:default","fs:allow-read-file","fs:allow-write-file","shell:allow-open"]}}
