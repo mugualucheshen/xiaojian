@@ -1,6 +1,6 @@
 [package]
 name = "xiaojian"
-version = "0.1.0"
+version = "0.1.1"
 description = "小剪 - 跨平台视频剪辑器"
 authors = ["高俊华"]
 license = "MIT"

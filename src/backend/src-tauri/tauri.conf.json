@@ -1,13 +1,13 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "小剪 (XiaoJian)",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "com.xiaojian.app",
   "build": {
-    "frontendDist": "../../frontend/dist",
+    "frontendDist": "../frontend/dist",
     "devUrl": "http://localhost:5173",
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeDevCommand": "npm --prefix /Users/longxia/Projects/xiaojian/src/frontend run dev",
+    "beforeBuildCommand": "npm --prefix /Users/longxia/Projects/xiaojian/src/frontend run build"
   },
   "app": {
     "windows": [
