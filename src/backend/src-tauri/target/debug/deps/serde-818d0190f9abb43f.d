@@ -1,0 +1,14 @@
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/deps/serde-818d0190f9abb43f.d: /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/serde-3941f6ad554aa60a/out/private.rs
+
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/deps/libserde-818d0190f9abb43f.rlib: /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/serde-3941f6ad554aa60a/out/private.rs
+
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/deps/libserde-818d0190f9abb43f.rmeta: /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/serde-3941f6ad554aa60a/out/private.rs
+
+/Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs:
+/Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs:
+/Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs:
+/Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs:
+/Users/longxia/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/serde-3941f6ad554aa60a/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/serde-3941f6ad554aa60a/out

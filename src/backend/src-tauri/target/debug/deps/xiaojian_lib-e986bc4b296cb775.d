@@ -1,0 +1,18 @@
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/deps/xiaojian_lib-e986bc4b296cb775.d: src/lib.rs /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/48fa718b85820c587ff90d92c42141a6933a4286186acd43415e25727d8382ac /Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/assets/index-5Rkhr2Ry.css /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/34da9ff2b3d32742384c2760003c425ac9fb966f07e1d7c6b6daea5466653db9.css /Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/index.html /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/47dd6ffcaf3042c9ff09d427ae99c12edb0cf9a6cc790249ffa850050bc86ded.html /Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/assets/index-BeBqB7wo.js /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/9f3473915ecde930eb5d9910dfbaae13542d69fa1fda98b4f3fc02be863e8951.js
+
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/deps/libxiaojian_lib-e986bc4b296cb775.rmeta: src/lib.rs /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/48fa718b85820c587ff90d92c42141a6933a4286186acd43415e25727d8382ac /Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/assets/index-5Rkhr2Ry.css /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/34da9ff2b3d32742384c2760003c425ac9fb966f07e1d7c6b6daea5466653db9.css /Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/index.html /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/47dd6ffcaf3042c9ff09d427ae99c12edb0cf9a6cc790249ffa850050bc86ded.html /Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/assets/index-BeBqB7wo.js /Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/9f3473915ecde930eb5d9910dfbaae13542d69fa1fda98b4f3fc02be863e8951.js
+
+src/lib.rs:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/48fa718b85820c587ff90d92c42141a6933a4286186acd43415e25727d8382ac:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/assets/index-5Rkhr2Ry.css:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/34da9ff2b3d32742384c2760003c425ac9fb966f07e1d7c6b6daea5466653db9.css:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/index.html:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/47dd6ffcaf3042c9ff09d427ae99c12edb0cf9a6cc790249ffa850050bc86ded.html:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/../../frontend/dist/assets/index-BeBqB7wo.js:
+/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out/tauri-codegen-assets/9f3473915ecde930eb5d9910dfbaae13542d69fa1fda98b4f3fc02be863e8951.js:
+
+# env-dep:CARGO_MANIFEST_DIR=/Users/longxia/Projects/xiaojian/src/backend/src-tauri
+# env-dep:CARGO_PKG_AUTHORS=高俊华
+# env-dep:CARGO_PKG_DESCRIPTION=小剪 - 跨平台视频剪辑器
+# env-dep:CARGO_PKG_NAME=xiaojian
+# env-dep:OUT_DIR=/Users/longxia/Projects/xiaojian/src/backend/src-tauri/target/debug/build/xiaojian-a0b2800ddac4d9aa/out

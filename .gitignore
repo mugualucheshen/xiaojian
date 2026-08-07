@@ -1,0 +1,47 @@
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+*.log
+
+# Rust / Tauri
+src/backend/target/
+src/backend/Cargo.lock.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Env
+.env
+.env.local
+*.pem
+*.key
+
+# Tauri build outputs
+src-tauri/target/
+src-tauri/gen/
+
+# Test outputs
+test-outputs/
+coverage/
+*.tsbuildinfo
+test_assets/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Tauri 全量排除 target
+**/target/
+**/gen/
+
+# Node
+**/node_modules/
