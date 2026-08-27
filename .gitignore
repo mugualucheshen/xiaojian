@@ -45,3 +45,9 @@ __pycache__/
 
 # Node
 **/node_modules/
+
+# tauri icon 命令生成的多余平台图标(只提交 macOS/Windows 需要的)
+src/backend/src-tauri/icons/Square*.png
+src/backend/src-tauri/icons/StoreLogo.png
+src/backend/src-tauri/icons/ios/
+src/backend/src-tauri/icons/android/

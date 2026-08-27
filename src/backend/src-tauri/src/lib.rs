@@ -1,8 +1,11 @@
 //! 小剪 (XiaoJian) Tauri 后端入口
 //!
-//! 这里只做"壳",真正的视频处理委托给 Python 引擎(xiaojian_engine),
-//! 通过子进程调用,避免 Rust 重写 FFmpeg 命令。
-//! 后期若性能要求高,再把热路径迁到 Rust。
+//! 这里只做"壳",真正的视频处理委托给:
+//!   - 直接调 ffmpeg/ffprobe(从 .app/Contents/Resources/ 找)
+//!   - Python 引擎(xiaojian_engine/)做复杂切片/混合
+//!
+//! 关键修复(v0.2.0):macOS .app 启动时 PATH 不含 /opt/homebrew,
+//! 所以"Command::new('ffprobe')" 会 ENOENT。改用 resource_dir() 找 .app 内置的。
 
 use std::path::PathBuf;
 use std::process::Command;
@@ -12,7 +15,7 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum XiaoJianError {
-    #[error("FFmpeg 未找到,请先安装系统 FFmpeg")]
+    #[error("FFmpeg 未找到(应用包内缺失,请重新安装小剪)")]
     FfmpegNotFound,
     #[error("Python 引擎错误: {0}")]
     EngineError(String),
@@ -59,34 +62,152 @@ pub struct JobResult {
     pub message: String,
 }
 
-// ---------- 引擎调用 ----------
+// ---------- 路径解析:从 .app 内部找 ffmpeg/ffprobe/python 引擎 ----------
 
-/// 找到 Python 引擎根目录(xiaojian_engine/)
+/// 拿到 .app 的 Contents/Resources 目录。
+/// dev 模式 (cargo tauri dev) 时回退到当前可执行文件旁。
+fn resources_dir() -> PathBuf {
+    // 优先尝试 std::env::current_exe 推算 .app/Contents/Resources
+    if let Ok(exe) = std::env::current_exe() {
+        // 生产 .app: .../小剪.app/Contents/MacOS/xiaojian
+        //          → 父目录就是 Contents
+        if let Some(contents) = exe.parent() {
+            // Tauri 2 把 externalBin(fireprobe/ffmpeg)放在 Contents/MacOS/
+            // 把 resources(我们的 Python 包)放在 Contents/Resources/
+            // 我们需要 Resources/,所以回退到 Contents/Resources
+            let res = contents.join("Resources");
+            if res.exists() {
+                return res;
+            }
+            // dev: target/debug/xiaojian → 父目录 = target/debug
+            return contents.to_path_buf();
+        }
+    }
+    PathBuf::from(".")
+}
+
+/// 找到 ffprobe 绝对路径(.app 内置优先,dev 模式回退到 PATH)
+///
+/// Tauri 2 `bundle.externalBin` 把外部二进制放到 .app/Contents/MacOS/ 下,
+/// 而不是 Resources/ 下(macOS codesign 要求)。
+fn ffprobe_path() -> Option<PathBuf> {
+    // 1. .app/Contents/MacOS/ffprobe (Tauri externalBin)
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(macos_dir) = exe.parent() {
+            let p = macos_dir.join("ffprobe");
+            if p.exists() {
+                return Some(p);
+            }
+        }
+    }
+    // 2. dev 模式回退:which ffprobe
+    which("ffprobe")
+}
+
+/// 找到 ffmpeg 绝对路径(给 Python 引擎用)
+fn ffmpeg_path() -> Option<PathBuf> {
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(macos_dir) = exe.parent() {
+            let p = macos_dir.join("ffmpeg");
+            if p.exists() {
+                return Some(p);
+            }
+        }
+    }
+    which("ffmpeg")
+}
+
+/// 找到 Python 引擎根目录。
+///
+/// `python -m xiaojian.cli` 启动时,需要 `xiaojian/` 这个包目录在 PYTHONPATH 上。
+/// PYTHONPATH 应该指向**包含 xiaojian/ 包的父目录**。
+///
+/// Tauri 2 把 `bundle.resources` 镜像到 .app/Contents/Resources/ 下,
+/// 路径里的 `../` 会被替换为 `_up_/`。所以 `../../../xiaojian_engine/xiaojian`
+/// 在 .app 里变成 `Resources/_up_/_up_/_up_/xiaojian_engine/xiaojian/`。
 fn engine_root() -> PathBuf {
-    // 开发时 CARGO_MANIFEST_DIR = src/backend/src-tauri
-    // 引擎在 <project>/xiaojian_engine
+    let res = resources_dir();
+    // 候选路径(生产/开发都覆盖)
+    let candidates = [
+        // 生产 .app 标准镜像
+        res.join("_up_")
+            .join("_up_")
+            .join("_up_")
+            .join("xiaojian_engine"),
+        res.join("_up_").join("_up_").join("xiaojian_engine"),
+        res.join("_up_").join("xiaojian_engine"),
+        res.join("xiaojian_engine"),
+    ];
+    for c in &candidates {
+        if c.join("xiaojian").join("__init__.py").exists() {
+            return c.clone();
+        }
+    }
+    // dev 模式:CARGO_MANIFEST_DIR 上两级 + /xiaojian_engine
     let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     p.pop(); // src/backend
     p.pop(); // src
     p.push("xiaojian_engine");
-    p
+    if p.exists() {
+        return p;
+    }
+    // fallback:空路径,run_engine 会报错提示
+    res
+}
+
+/// `which name` 等价物
+fn which(name: &str) -> Option<PathBuf> {
+    if let Some(paths) = std::env::var_os("PATH") {
+        for dir in std::env::split_paths(&paths) {
+            let candidate = dir.join(name);
+            if candidate.is_file() {
+                return Some(candidate);
+            }
+        }
+    }
+    None
+}
+
+/// 找到 python 解释器(系统 PATH 里)
+fn python_path() -> Option<PathBuf> {
+    which("python3").or_else(|| which("python"))
 }
 
 fn run_engine(args: &[&str]) -> CmdResult<String> {
     let engine = engine_root();
-    let engine_str = engine.to_str().ok_or_else(|| {
-        XiaoJianError::EngineError("引擎路径包含非 UTF-8 字符".to_string())
-    })?;
+    if !engine.exists() {
+        return Err(XiaoJianError::EngineError(format!(
+            "Python 引擎目录不存在: {}",
+            engine.display()
+        )));
+    }
+    let engine_str = engine
+        .to_str()
+        .ok_or_else(|| XiaoJianError::EngineError("引擎路径包含非 UTF-8 字符".to_string()))?;
 
-    // 优先 python3,再试 python
-    let py = which_python().ok_or(XiaoJianError::FfmpegNotFound)?; // 这里简化,后续会拆
+    let py = python_path().ok_or(XiaoJianError::FfmpegNotFound)?;
 
     let output = Command::new(&py)
         .args(["-m", "xiaojian.cli"])
         .args(args)
         .env("PYTHONPATH", engine_str)
         .env("LC_ALL", "en_US.UTF-8")
-        .current_dir(engine)
+        // 告诉 Python 引擎 ffmpeg 在哪(否则它也会 ENOENT)
+        .env(
+            "XIAOJIAN_FFMPEG",
+            ffmpeg_path()
+                .as_ref()
+                .map(|p| p.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+        )
+        .env(
+            "XIAOJIAN_FFPROBE",
+            ffprobe_path()
+                .as_ref()
+                .map(|p| p.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+        )
+        .current_dir(&engine)
         .output()?;
 
     if !output.status.success() {
@@ -96,39 +217,25 @@ fn run_engine(args: &[&str]) -> CmdResult<String> {
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
 
-fn which_python() -> Option<String> {
-    for cand in ["python3", "python"] {
-        if let Ok(out) = Command::new("which").arg(cand).output() {
-            if out.status.success() {
-                if let Ok(s) = String::from_utf8(out.stdout) {
-                    let s = s.trim().to_string();
-                    if !s.is_empty() {
-                        return Some(s);
-                    }
-                }
-            }
-        }
-    }
-    None
-}
-
 // ---------- Tauri 命令(给前端调用) ----------
 
 /// 查看媒体信息
 #[tauri::command]
 fn cmd_probe(path: String) -> CmdResult<MediaInfoDto> {
-    // 让 Python 走 probe,再以 JSON 返回(简化:本版只返回 path 解析)
-    // stdout 这里不直接用,真正拿数据走下面 ffprobe
-    let _ = run_engine(&["probe", &path])?;
-    // stdout 是纯文本,我们用 probe JSON 模式更稳——这里先用 ffprobe 直接拿
-    let out = Command::new("ffprobe")
+    let ffprobe = ffprobe_path().ok_or(XiaoJianError::FfmpegNotFound)?;
+
+    let out = Command::new(&ffprobe)
         .args([
-            "-v", "error",
-            "-print_format", "json",
-            "-show_format", "-show_streams",
+            "-v",
+            "error",
+            "-print_format",
+            "json",
+            "-show_format",
+            "-show_streams",
             &path,
         ])
         .output()?;
+
     if !out.status.success() {
         return Err(XiaoJianError::EngineError(
             String::from_utf8_lossy(&out.stderr).to_string(),
@@ -189,19 +296,13 @@ fn parse_probe(v: &serde_json::Value, path: &str) -> CmdResult<MediaInfoDto> {
 
 /// 分段导出
 #[tauri::command]
-fn cmd_split(
-    input: String,
-    marks: Vec<f64>,
-    output_dir: String,
-) -> CmdResult<JobResult> {
+fn cmd_split(input: String, marks: Vec<f64>, output_dir: String) -> CmdResult<JobResult> {
     let marks_str = marks
         .iter()
         .map(|v| v.to_string())
         .collect::<Vec<_>>()
         .join(",");
-    let stdout = run_engine(&[
-        "split", &input, "--marks", &marks_str, "-o", &output_dir,
-    ])?;
+    let stdout = run_engine(&["split", &input, "--marks", &marks_str, "-o", &output_dir])?;
     Ok(JobResult {
         outputs: vec![],
         message: stdout,
@@ -217,7 +318,14 @@ fn cmd_extract(
     bitrate: String,
 ) -> CmdResult<JobResult> {
     let stdout = run_engine(&[
-        "extract", &input, "-o", &output, "--format", &format, "--bitrate", &bitrate,
+        "extract",
+        &input,
+        "-o",
+        &output,
+        "--format",
+        &format,
+        "--bitrate",
+        &bitrate,
     ])?;
     Ok(JobResult {
         outputs: vec![output],
@@ -237,7 +345,15 @@ fn cmd_mix(
     let mv = main_volume.to_string();
     let bv = bgm_volume.to_string();
     let stdout = run_engine(&[
-        "mix", &video, &bgm, "-o", &output, "--main-volume", &mv, "--bgm-volume", &bv,
+        "mix",
+        &video,
+        &bgm,
+        "-o",
+        &output,
+        "--main-volume",
+        &mv,
+        "--bgm-volume",
+        &bv,
     ])?;
     Ok(JobResult {
         outputs: vec![output],

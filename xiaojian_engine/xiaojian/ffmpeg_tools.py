@@ -90,8 +90,12 @@ class ExportOptions:
 # ---------- FFmpeg 探测 ----------
 
 def ensure_ffmpeg() -> str:
-    """检查系统 ffmpeg 是否可用,返回绝对路径。"""
-    path = shutil.which("ffmpeg")
+    """检查 ffmpeg 是否可用,返回绝对路径。
+
+    优先使用 XIAOJIAN_FFMPEG 环境变量(由小剪 Tauri 端注入,指向 .app 内置的 ffmpeg),
+    否则回退到系统 PATH 查找(开发模式或系统装了 Homebrew 时)。
+    """
+    path = os.environ.get("XIAOJIAN_FFMPEG") or shutil.which("ffmpeg")
     if not path:
         raise FFmpegNotFoundError(
             "未找到 ffmpeg。请先安装:macOS: brew install ffmpeg | Windows: choco install ffmpeg"
@@ -100,8 +104,8 @@ def ensure_ffmpeg() -> str:
 
 
 def ensure_ffprobe() -> str:
-    """检查 ffprobe 可用性。"""
-    path = shutil.which("ffprobe")
+    """检查 ffprobe 可用性。优先用 XIAOJIAN_FFPROBE 环境变量。"""
+    path = os.environ.get("XIAOJIAN_FFPROBE") or shutil.which("ffprobe")
     if not path:
         raise FFmpegNotFoundError("未找到 ffprobe(应与 ffmpeg 同装)。")
     return path

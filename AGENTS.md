@@ -50,6 +50,10 @@ cd src/frontend && npm run tauri dev
 # 跑测试
 cd src/frontend && npm test
 cd src/backend  && cargo test
+
+# 🚀 一键生产构建(macOS 当前架构,.app + .dmg)
+./build.sh
+# 详见 docs/BUILD.md(支持 --target universal / --skip-frontend / --debug 等参数)
 ```
 
 ## 5. 跨角色协作
@@ -68,3 +72,26 @@ cd src/backend  && cargo test
 - 许可证合规:CI 跑 `npx license-checker --failOn 'GPL'`
 - 代码质量:ESLint + Clippy
 - 性能:导出 1080p 30s 视频 < 30s
+
+## 7. 一键生产构建(老板向)
+
+`./build.sh` 一条命令跑完:依赖检查 → Python 引擎真实验证(US-01 ffmpeg 切片)→ 前端构建 → Tauri 构建 → 打包 .app/.dmg。
+
+| 平台 | 产物 | 实测大小 | 备注 |
+|------|------|---------|------|
+| macOS 当前架构 | `.app` + `.dmg` | 13M / 3.8M(压缩) | v0.1.1 在 Apple Silicon 跑通 |
+| macOS 通用包 | `.app` + `.dmg` | — | `./build.sh --target universal` |
+| Windows 10/11 | `.msi` + `.exe` | — | 需在 Windows / 交叉编译环境跑 |
+
+**首次 release 编译时间**:Apple Silicon 大约 12-15 分钟(其中 wry + LTO 占大头)。**增量编译**:44 秒。
+
+**常见踩坑**(已记入 build.sh 自动处理):
+
+- `frontendDist` 必须用 `../../frontend/dist`(tauri.conf.json 路径基于 src-tauri 目录)
+- `bundle.identifier` 不能以 `.app` 结尾(macOS 应用后缀冲突)
+- `bundle.category` 必须是 Tauri LSApplicationCategory 枚举值(`Video`,`DeveloperTool`,`Music`...),自造词(如 `VideoEditor`)会报 `invalid category`
+- macOS DMG 打包需要 `icons/icon.icns`(用 `tauri icon <大png> --output icons` 自动生成)
+- tauri-cli 装在 `frontend/node_modules/.bin/tauri`,**不是** `cargo tauri`(项目用 npm 装的)
+
+**已验证**:v0.1.1 在 Apple Silicon 上 `open 小剪 (XiaoJian).app` 可正常启动,进程稳定。
+

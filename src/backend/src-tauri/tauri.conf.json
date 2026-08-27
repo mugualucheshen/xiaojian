@@ -1,10 +1,10 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "小剪 (XiaoJian)",
-  "version": "0.1.1",
-  "identifier": "com.xiaojian.app",
+  "version": "0.2.0",
+  "identifier": "com.xiaojian.editor",
   "build": {
-    "frontendDist": "../frontend/dist",
+    "frontendDist": "../../frontend/dist",
     "devUrl": "http://localhost:5173",
     "beforeDevCommand": "npm --prefix /Users/longxia/Projects/xiaojian/src/frontend run dev",
     "beforeBuildCommand": "npm --prefix /Users/longxia/Projects/xiaojian/src/frontend run build"
@@ -28,14 +28,23 @@
   "bundle": {
     "active": true,
     "targets": ["dmg", "msi", "app"],
+    "externalBin": [
+      "bin/ffmpeg",
+      "bin/ffprobe"
+    ],
+    "resources": {
+      "../../../xiaojian_engine/xiaojian": "engine/xiaojian"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/256x256.png",
-      "icons/512x512.png"
+      "icons/512x512.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ],
-    "category": "VideoEditor",
+    "category": "Video",
     "shortDescription": "轻量跨平台视频剪辑器",
     "longDescription": "小剪 (XiaoJian) 是一款开源、跨平台的轻量视频剪辑器。支持视频分段、音频提取、混合剪辑。"
   },
